@@ -1,0 +1,14 @@
+[package]
+name = "sounding-validate"
+version = "0.0.1"
+authors = ["Ryan Leach <clumsycodemonkey@gmail.com>"]
+description = """Validation of soundings from the sounding-base crate."""
+repository = "https://github.com/rnleach/sounding-validate.git"
+readme = "README.md"
+license-file = "LICENSE"
+exclude = ["**/*.rs.bk",".gitignore",".vscode/**/*"]
+categories = ["science"]
+keywords = ["weather","sounding","meteorology", "skew-t"]
+
+[dependencies]
+error-chain = "^0.11"
