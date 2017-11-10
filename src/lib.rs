@@ -147,7 +147,6 @@ fn check_vertical_height_pressure(snd: &Sounding, error_msg: &mut String) {
     }
 
     // Check height always increases with height.
-    // FIXME: Is height AGL or ASL?
     let height = snd.get_profile(GeopotentialHeight);
     let mut height_one_level_down = snd.get_location().2.as_option().unwrap_or(::std::f64::MIN);
     for hght in height.iter().filter_map(|hght| hght.as_option()) {
