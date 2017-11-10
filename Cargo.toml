@@ -11,4 +11,5 @@ categories = ["science"]
 keywords = ["weather","sounding","meteorology", "skew-t"]
 
 [dependencies]
+sounding-base = "^0.0.14"
 error-chain = "^0.11"
