@@ -1,12 +1,11 @@
 extern crate sounding_base;
 extern crate sounding_validate;
 
-use sounding_base::{Sounding, OptionVal};
+use sounding_base::{OptionVal, Sounding};
 use sounding_validate::validate;
 
 #[test]
 fn test_validate() {
-
     let snd = create_valid_test_sounding();
     let result = validate(&snd);
     if result.is_err() {

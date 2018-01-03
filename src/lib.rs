@@ -6,7 +6,7 @@
 extern crate error_chain;
 
 extern crate sounding_base;
-use sounding_base::{Sounding, OptionVal};
+use sounding_base::{OptionVal, Sounding};
 
 pub mod error;
 pub use error::*;
@@ -24,7 +24,6 @@ macro_rules! validate_f64_positive {
 /// Validates the sounding with some simple sanity checks. For instance, checks that pressure
 /// decreases with height.
 pub fn validate(snd: &Sounding) -> Result<()> {
-
     use sounding_base::Profile::*;
     use sounding_base::Surface::*;
     use sounding_base::Index::*;
@@ -82,7 +81,6 @@ pub fn validate(snd: &Sounding) -> Result<()> {
         if cld < 0.0 {
             error_msg.push_str(&format!("\nCloud fraction < 0: {} < 0.0", cld));
         }
-
     }
 
     // Index checks
@@ -139,8 +137,7 @@ fn check_vertical_height_pressure(snd: &Sounding, error_msg: &mut String) {
         if pressure_one_level_down < pres {
             error_msg.push_str(&format!(
                 "\nPressure increasing with height: {} < {}",
-                pressure_one_level_down,
-                pres
+                pressure_one_level_down, pres
             ));
         }
         pressure_one_level_down = pres;
@@ -153,8 +150,7 @@ fn check_vertical_height_pressure(snd: &Sounding, error_msg: &mut String) {
         if height_one_level_down > hght {
             error_msg.push_str(&format!(
                 "\nHeight values decreasing with height: {} > {}",
-                height_one_level_down,
-                hght
+                height_one_level_down, hght
             ));
         }
         height_one_level_down = hght;
@@ -162,7 +158,7 @@ fn check_vertical_height_pressure(snd: &Sounding, error_msg: &mut String) {
 }
 
 fn check_temp_wet_bulb_dew_point(snd: &Sounding, error_msg: &mut String) {
-    use sounding_base::Profile::{Temperature, WetBulb, DewPoint};
+    use sounding_base::Profile::{DewPoint, Temperature, WetBulb};
 
     let temperature = snd.get_profile(Temperature);
     let wet_bulb = snd.get_profile(WetBulb);
@@ -172,33 +168,21 @@ fn check_temp_wet_bulb_dew_point(snd: &Sounding, error_msg: &mut String) {
     for (t, wb) in temperature.iter().zip(wet_bulb.iter()) {
         if let (Some(t), Some(wb)) = (t.as_option(), wb.as_option()) {
             if t < wb {
-                error_msg.push_str(&format!(
-                    "\nTemperature < Wet bulb: {} < {}",
-                    t,
-                    wb,
-                ));
+                error_msg.push_str(&format!("\nTemperature < Wet bulb: {} < {}", t, wb,));
             }
         }
     }
     for (t, dp) in temperature.iter().zip(dew_point.iter()) {
         if let (Some(t), Some(dp)) = (t.as_option(), dp.as_option()) {
             if t < dp {
-                error_msg.push_str(&format!(
-                    "\nTemperature < Dew Point: {} < {}",
-                    t,
-                    dp,
-                ));
+                error_msg.push_str(&format!("\nTemperature < Dew Point: {} < {}", t, dp,));
             }
         }
     }
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
         if let (Some(wb), Some(dp)) = (wb.as_option(), dp.as_option()) {
             if wb < dp {
-                error_msg.push_str(&format!(
-                    "\nWet bulb < Dew Point: {} < {}",
-                    wb,
-                    dp,
-                ));
+                error_msg.push_str(&format!("\nWet bulb < Dew Point: {} < {}", wb, dp,));
             }
         }
     }
