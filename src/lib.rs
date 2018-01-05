@@ -6,14 +6,14 @@
 extern crate error_chain;
 
 extern crate sounding_base;
-use sounding_base::{OptionVal, Sounding};
+use sounding_base::Sounding;
 
 pub mod error;
 pub use error::*;
 
 macro_rules! validate_f64_positive {
     ($var:expr, $err_msg:ident, $var_name:expr) => {
-        if let Some(val) = $var.as_option() {
+        if let Some(val) = $var {
             if val < 0.0 {
                 $err_msg.push_str(&format!("\n{} < 0.0: {}", $var_name, val));
             }
@@ -70,14 +70,14 @@ pub fn validate(snd: &Sounding) -> Result<()> {
     check_temp_wet_bulb_dew_point(snd, &mut error_msg);
 
     // Check that speed >= 0
-    for spd in speed.iter().filter_map(|spd| spd.as_option()) {
+    for spd in speed.iter().filter_map(|spd| *spd) {
         if spd < 0.0 {
             error_msg.push_str(&format!("\nWind speed < 0: {} < 0.0", spd));
         }
     }
 
     // Check that cloud fraction >= 0
-    for cld in cloud_fraction.iter().filter_map(|cld| cld.as_option()) {
+    for cld in cloud_fraction.iter().filter_map(|cld| *cld) {
         if cld < 0.0 {
             error_msg.push_str(&format!("\nCloud fraction < 0: {} < 0.0", cld));
         }
@@ -88,7 +88,7 @@ pub fn validate(snd: &Sounding) -> Result<()> {
     validate_f64_positive!(snd.get_index(PWAT), error_msg, "PWAT");
 
     // Check that cin <= 0
-    if let Some(val) = snd.get_index(CIN).as_option() {
+    if let Some(val) = snd.get_index(CIN) {
         if val > 0.0 {
             error_msg.push_str(&format!("\nCINS > 0.0: {}", val));
         }
@@ -108,13 +108,13 @@ pub fn validate(snd: &Sounding) -> Result<()> {
     }
 }
 
-fn check_pressure_exists(pressure: &[OptionVal<f64>], error_msg: &mut String) {
+fn check_pressure_exists(pressure: &[Option<f64>], error_msg: &mut String) {
     if pressure.is_empty() {
         error_msg.push_str("\nPressure variable required, none given.");
     }
 }
 
-fn validate_vector_len(vec: &[OptionVal<f64>], len: usize, error_msg: &mut String, var_name: &str) {
+fn validate_vector_len(vec: &[Option<f64>], len: usize, error_msg: &mut String, var_name: &str) {
     if !vec.is_empty() && vec.len() != len {
         error_msg.push_str(&format!(
             "\n{} array has different length than pressure array.",
@@ -131,9 +131,8 @@ fn check_vertical_height_pressure(snd: &Sounding, error_msg: &mut String) {
     // than the lowest pressure level in sounding.
     let pressure = snd.get_profile(Pressure);
     let mut pressure_one_level_down = snd.get_surface_value(StationPressure)
-        .as_option()
         .unwrap_or(::std::f64::MAX);
-    for pres in pressure.iter().filter_map(|pres| pres.as_option()) {
+    for pres in pressure.iter().filter_map(|pres| *pres) {
         if pressure_one_level_down < pres {
             error_msg.push_str(&format!(
                 "\nPressure increasing with height: {} < {}",
@@ -145,8 +144,8 @@ fn check_vertical_height_pressure(snd: &Sounding, error_msg: &mut String) {
 
     // Check height always increases with height.
     let height = snd.get_profile(GeopotentialHeight);
-    let mut height_one_level_down = snd.get_location().2.as_option().unwrap_or(::std::f64::MIN);
-    for hght in height.iter().filter_map(|hght| hght.as_option()) {
+    let mut height_one_level_down = snd.get_location().2.unwrap_or(::std::f64::MIN);
+    for hght in height.iter().filter_map(|hght| *hght) {
         if height_one_level_down > hght {
             error_msg.push_str(&format!(
                 "\nHeight values decreasing with height: {} > {}",
@@ -166,21 +165,21 @@ fn check_temp_wet_bulb_dew_point(snd: &Sounding, error_msg: &mut String) {
 
     // Check that dew point <= wet bulb <= t
     for (t, wb) in temperature.iter().zip(wet_bulb.iter()) {
-        if let (Some(t), Some(wb)) = (t.as_option(), wb.as_option()) {
+        if let (Some(t), Some(wb)) = (*t, *wb) {
             if t < wb {
                 error_msg.push_str(&format!("\nTemperature < Wet bulb: {} < {}", t, wb,));
             }
         }
     }
     for (t, dp) in temperature.iter().zip(dew_point.iter()) {
-        if let (Some(t), Some(dp)) = (t.as_option(), dp.as_option()) {
+        if let (Some(t), Some(dp)) = (*t, *dp) {
             if t < dp {
                 error_msg.push_str(&format!("\nTemperature < Dew Point: {} < {}", t, dp,));
             }
         }
     }
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
-        if let (Some(wb), Some(dp)) = (wb.as_option(), dp.as_option()) {
+        if let (Some(wb), Some(dp)) = (*wb, *dp) {
             if wb < dp {
                 error_msg.push_str(&format!("\nWet bulb < Dew Point: {} < {}", wb, dp,));
             }
