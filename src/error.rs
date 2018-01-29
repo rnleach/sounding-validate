@@ -1,4 +1,4 @@
-//! Errors for the soudning-base crate.
+//! Errors for the sounding-validate crate.
 use std::fmt;
 
 use failure::Fail;
