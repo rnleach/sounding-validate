@@ -128,7 +128,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
 
     // Check height always increases with height.
     let height = snd.get_profile(GeopotentialHeight);
-    let mut height_one_level_down = snd.get_location().2.unwrap_or(::std::f64::MIN);
+    let mut height_one_level_down = snd.get_station_info().elevation().unwrap_or(::std::f64::MIN);
     for hght in height.iter().filter_map(|hght| *hght) {
         if height_one_level_down > hght {
             return Err(ValidationError::PressureNotDecreasingWithHeight);

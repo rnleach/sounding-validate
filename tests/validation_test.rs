@@ -1,7 +1,7 @@
 extern crate sounding_base;
 extern crate sounding_validate;
 
-use sounding_base::Sounding;
+use sounding_base::{Sounding, StationInfo};
 use sounding_validate::validate;
 
 #[test]
@@ -23,10 +23,9 @@ fn create_valid_test_sounding() -> Sounding {
     use sounding_base::Surface;
 
     Sounding::new()
-        .set_station_num(1)
+        .set_station_info(StationInfo::new_with_values(1, (45.0, -115.0), 1023.0))
         .set_valid_time(None)
         .set_lead_time(0)
-        .set_location(45.0, -115.0, 1023.0)
         .set_index(Showalter, -2.0)
         .set_index(LI, -2.0)
         .set_index(SWeT, 35.0)
