@@ -24,27 +24,27 @@ macro_rules! validate_f64_positive {
 /// Validates the sounding with some simple sanity checks. For instance, checks that pressure
 /// decreases with height.
 pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
-    use sounding_base::Profile::*;
-    use sounding_base::Surface::*;
+    use sounding_base::Profile;
+    use sounding_base::Surface;
     use sounding_base::Index::*;
 
     let mut err_return = ValidationErrors::new();
 
-    let pressure = snd.get_profile(Pressure);
+    let pressure = snd.get_profile(Profile::Pressure);
 
     // Sounding checks
     err_return.push_error(check_pressure_exists(pressure)); // Pressure required as vertical coordinate
 
     let len = pressure.len();
-    let temperature = snd.get_profile(Temperature);
-    let wet_bulb = snd.get_profile(WetBulb);
-    let dew_point = snd.get_profile(DewPoint);
-    let theta_e = snd.get_profile(ThetaE);
-    let direction = snd.get_profile(WindDirection);
-    let speed = snd.get_profile(WindSpeed);
-    let omega = snd.get_profile(PressureVerticalVelocity);
-    let height = snd.get_profile(GeopotentialHeight);
-    let cloud_fraction = snd.get_profile(CloudFraction);
+    let temperature = snd.get_profile(Profile::Temperature);
+    let wet_bulb = snd.get_profile(Profile::WetBulb);
+    let dew_point = snd.get_profile(Profile::DewPoint);
+    let theta_e = snd.get_profile(Profile::ThetaE);
+    let direction = snd.get_profile(Profile::WindDirection);
+    let speed = snd.get_profile(Profile::WindSpeed);
+    let omega = snd.get_profile(Profile::PressureVerticalVelocity);
+    let height = snd.get_profile(Profile::GeopotentialHeight);
+    let cloud_fraction = snd.get_profile(Profile::CloudFraction);
 
     err_return.push_error(validate_vector_len(temperature, len, "Temperature"));
     err_return.push_error(validate_vector_len(wet_bulb, len, "Wet bulb temperature"));
@@ -87,9 +87,9 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
 
     // Surface checks
     // Check that hi, mid, and low cloud are all positive or zero
-    validate_f64_positive!(snd.get_surface_value(LowCloud), "Low cloud", err_return);
-    validate_f64_positive!(snd.get_surface_value(MidCloud), "Mid cloud", err_return);
-    validate_f64_positive!(snd.get_surface_value(HighCloud), "Hi cloud", err_return);
+    validate_f64_positive!(snd.get_surface_value(Surface::LowCloud), "Low cloud", err_return);
+    validate_f64_positive!(snd.get_surface_value(Surface::MidCloud), "Mid cloud", err_return);
+    validate_f64_positive!(snd.get_surface_value(Surface::HighCloud), "Hi cloud", err_return);
 
     err_return.check_any()
 }
