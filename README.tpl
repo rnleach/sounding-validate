@@ -3,8 +3,6 @@
 [![Latest Version](https://img.shields.io/crates/v/sounding-validate.svg)](https://crates.io/crates/sounding-validate)
 [![docs](https://docs.rs/sounding-validate/badge.svg)](https://docs.rs/sounding-validate)
 
-# sounding-validate
+# {{crate}}
 
-Provides validation facilities for the
-[sounding-base](https://github.com/rnleach/sounding-base.git) crate.
-
+{{readme}}

@@ -1,5 +1,8 @@
 #![warn(missing_docs)]
-//! Library to validate an atmospheric sounding.
+/*! Provides validation facilities for the 
+[sounding-base](https://github.com/rnleach/sounding-base.git) crate.
+
+*/
 
 extern crate failure;
 #[macro_use]
