@@ -19,26 +19,12 @@ fn test_validate() {
 
 fn create_valid_test_sounding() -> Sounding {
     use sounding_base::Profile;
-    use sounding_base::Index::*;
     use sounding_base::Surface;
 
     Sounding::new()
         .set_station_info(StationInfo::new_with_values(1, (45.0, -115.0), 1023.0))
         .set_valid_time(None)
         .set_lead_time(0)
-        .set_index(Showalter, -2.0)
-        .set_index(LI, -2.0)
-        .set_index(SWeT, 35.0)
-        .set_index(K, 45.0)
-        .set_index(LCL, 850.0)
-        .set_index(PWAT, 2.0)
-        .set_index(TotalTotals, 55.0)
-        .set_index(CAPE, 852.0)
-        .set_index(LCLTemperature, 290.0)
-        .set_index(CIN, -200.0)
-        .set_index(EquilibrimLevel, 222.0)
-        .set_index(LFC, 800.0)
-        .set_index(BulkRichardsonNumber, 1.2)
         .set_profile(
             Profile::Pressure,
             vec![
@@ -150,5 +136,5 @@ fn create_valid_test_sounding() -> Sounding {
 }
 
 fn create_invalid_test_sounding() -> Sounding {
-    create_valid_test_sounding().set_index(sounding_base::Index::PWAT, -5.1)
+    create_valid_test_sounding().set_surface_value(sounding_base::Surface::StationPressure, 830.0)
 }

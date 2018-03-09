@@ -4,6 +4,15 @@
 
 */
 
+//
+// API
+//
+pub use error::{ValidationError, ValidationErrors};
+
+//
+// Internal use only
+//
+
 extern crate failure;
 #[macro_use]
 extern crate failure_derive;
@@ -12,7 +21,6 @@ extern crate sounding_base;
 use sounding_base::Sounding;
 
 mod error;
-pub use error::{ValidationError, ValidationErrors};
 
 macro_rules! validate_f64_positive {
     ($var:expr, $var_name:expr, $err_list:ident) => {
@@ -29,14 +37,17 @@ macro_rules! validate_f64_positive {
 pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     use sounding_base::Profile;
     use sounding_base::Surface;
-    use sounding_base::Index::*;
 
     let mut err_return = ValidationErrors::new();
 
     let pressure = snd.get_profile(Profile::Pressure);
 
+    //
     // Sounding checks
-    err_return.push_error(check_pressure_exists(pressure)); // Pressure required as vertical coordinate
+    //
+
+    // Pressure required as vertical coordinate.
+    err_return.push_error(check_pressure_exists(pressure));
 
     let len = pressure.len();
     let temperature = snd.get_profile(Profile::Temperature);
@@ -75,17 +86,6 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     // Check that cloud fraction >= 0
     for cld in cloud_fraction {
         validate_f64_positive!(*cld, "Cloud fraction", err_return);
-    }
-
-    // Index checks
-    validate_f64_positive!(snd.get_index(CAPE), "CAPE", err_return);
-    validate_f64_positive!(snd.get_index(PWAT), "PWAT", err_return);
-
-    // Check that cin <= 0
-    if let Some(val) = snd.get_index(CIN) {
-        if val > 0.0 {
-            err_return.push_error(Err(ValidationError::InvalidPositiveValue("CINS", val)));
-        }
     }
 
     // Surface checks
