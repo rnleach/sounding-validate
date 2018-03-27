@@ -2,7 +2,7 @@
 /*! Provides validation facilities for the 
 [sounding-base](https://github.com/rnleach/sounding-base.git) crate.
 
-See [integration tests](tests/validation_test.rs) for example of library use.
+See [examples](examples/validate.rs) for example of library use.
 
 */
 
@@ -68,7 +68,11 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     err_return.push_error(validate_vector_len(theta_e, len, "Theta-e"));
     err_return.push_error(validate_vector_len(direction, len, "Wind direction"));
     err_return.push_error(validate_vector_len(speed, len, "wind speed"));
-    err_return.push_error(validate_vector_len(omega, len, "Omega (pressure vertical velocity)"));
+    err_return.push_error(validate_vector_len(
+        omega,
+        len,
+        "Omega (pressure vertical velocity)",
+    ));
     err_return.push_error(validate_vector_len(height, len, "Height"));
     err_return.push_error(validate_vector_len(cloud_fraction, len, "Cloud fraction"));
 
@@ -92,9 +96,21 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
 
     // Surface checks
     // Check that hi, mid, and low cloud are all positive or zero
-    validate_f64_positive!(snd.get_surface_value(Surface::LowCloud), "Low cloud", err_return);
-    validate_f64_positive!(snd.get_surface_value(Surface::MidCloud), "Mid cloud", err_return);
-    validate_f64_positive!(snd.get_surface_value(Surface::HighCloud), "Hi cloud", err_return);
+    validate_f64_positive!(
+        snd.get_surface_value(Surface::LowCloud),
+        "Low cloud",
+        err_return
+    );
+    validate_f64_positive!(
+        snd.get_surface_value(Surface::MidCloud),
+        "Mid cloud",
+        err_return
+    );
+    validate_f64_positive!(
+        snd.get_surface_value(Surface::HighCloud),
+        "Hi cloud",
+        err_return
+    );
 
     err_return.check_any()
 }
@@ -107,15 +123,23 @@ fn check_pressure_exists(pressure: &[Option<f64>]) -> Result<(), ValidationError
     }
 }
 
-fn validate_vector_len(vec: &[Option<f64>], len: usize, var_name: &'static str) -> Result<(), ValidationError>{
+fn validate_vector_len(
+    vec: &[Option<f64>],
+    len: usize,
+    var_name: &'static str,
+) -> Result<(), ValidationError> {
     if !vec.is_empty() && vec.len() != len {
-        Err(ValidationError::InvalidVectorLength(var_name, vec.len(), len))
+        Err(ValidationError::InvalidVectorLength(
+            var_name,
+            vec.len(),
+            len,
+        ))
     } else {
         Ok(())
     }
 }
 
-fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>{
+fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError> {
     use sounding_base::Profile::{GeopotentialHeight, Pressure};
     use sounding_base::Surface::StationPressure;
 
@@ -133,7 +157,9 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
 
     // Check height always increases with height.
     let height = snd.get_profile(GeopotentialHeight);
-    let mut height_one_level_down = snd.get_station_info().elevation().unwrap_or(::std::f64::MIN);
+    let mut height_one_level_down = snd.get_station_info()
+        .elevation()
+        .unwrap_or(::std::f64::MIN);
     for hght in height.iter().filter_map(|hght| *hght) {
         if height_one_level_down > hght {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
@@ -144,7 +170,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     Ok(())
 }
 
-fn check_temp_wet_bulb_dew_point(snd: &Sounding) -> Result<(), ValidationError>{
+fn check_temp_wet_bulb_dew_point(snd: &Sounding) -> Result<(), ValidationError> {
     use sounding_base::Profile::{DewPoint, Temperature, WetBulb};
 
     let temperature = snd.get_profile(Temperature);
@@ -169,7 +195,7 @@ fn check_temp_wet_bulb_dew_point(snd: &Sounding) -> Result<(), ValidationError>{
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
         if let (Some(wb), Some(dp)) = (*wb, *dp) {
             if wb < dp {
-                return Err(ValidationError::WetBulbLessThanDewPoint(wb,dp));
+                return Err(ValidationError::WetBulbLessThanDewPoint(wb, dp));
             }
         }
     }
