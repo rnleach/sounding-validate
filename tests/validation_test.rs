@@ -131,8 +131,8 @@ fn create_valid_test_sounding() -> Sounding {
         )
         .set_surface_value(Surface::MSLP, 1014.0)
         .set_surface_value(Surface::StationPressure, 847.0)
-        .set_surface_value(Surface::UWind, 0.0)
-        .set_surface_value(Surface::VWind, 0.0)
+        .set_surface_value(Surface::WindSpeed, 0.0)
+        .set_surface_value(Surface::WindDirection, 0.0)
 }
 
 fn create_invalid_test_sounding() -> Sounding {
