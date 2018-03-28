@@ -34,6 +34,16 @@ macro_rules! validate_f64_positive {
     };
 }
 
+macro_rules! validate_wind_direction {
+    ($var:expr, $err_list:ident) => {
+        if let Some(val) = $var {
+            if val < 0.0 || val > 360.0 {
+                $err_list.push_error(Err(ValidationError::InvalidWindDirection(val)));
+            }
+        }
+    };
+}
+
 /// Validates the sounding with some simple sanity checks. For instance, checks that pressure
 /// decreases with height.
 pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
@@ -82,11 +92,16 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     err_return.push_error(check_vertical_height_pressure(snd));
 
     // Check that dew point <= wet bulb <= t
-    err_return.push_error(check_temp_wet_bulb_dew_point(snd));
+    check_temp_wet_bulb_dew_point(snd, &mut err_return);
 
     // Check that speed >= 0
     for spd in speed {
         validate_f64_positive!(*spd, "Wind speed", err_return);
+    }
+
+    // Check that direction >= 0 && <= 360
+    for dir in direction {
+        validate_wind_direction!(*dir, err_return);
     }
 
     // Check that cloud fraction >= 0
@@ -109,6 +124,22 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     validate_f64_positive!(
         snd.get_surface_value(Surface::HighCloud),
         "Hi cloud",
+        err_return
+    );
+
+    validate_f64_positive!(
+        snd.get_surface_value(Surface::WindSpeed),
+        "Surface wind speed",
+        err_return
+    );
+
+    validate_wind_direction!(snd.get_surface_value(Surface::WindDirection), err_return);
+
+    validate_f64_positive!(snd.get_surface_value(Surface::MSLP), "MSLP", err_return);
+
+    validate_f64_positive!(
+        snd.get_surface_value(Surface::StationPressure),
+        "Station pressure",
         err_return
     );
 
@@ -170,7 +201,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     Ok(())
 }
 
-fn check_temp_wet_bulb_dew_point(snd: &Sounding) -> Result<(), ValidationError> {
+fn check_temp_wet_bulb_dew_point(snd: &Sounding, ve: &mut ValidationErrors) {
     use sounding_base::Profile::{DewPoint, Temperature, WetBulb};
 
     let temperature = snd.get_profile(Temperature);
@@ -181,24 +212,22 @@ fn check_temp_wet_bulb_dew_point(snd: &Sounding) -> Result<(), ValidationError> 
     for (t, wb) in temperature.iter().zip(wet_bulb.iter()) {
         if let (Some(t), Some(wb)) = (*t, *wb) {
             if t < wb {
-                return Err(ValidationError::TemperatureLessThanWetBulb(t, wb));
+                ve.push_error(Err(ValidationError::TemperatureLessThanWetBulb(t, wb)));
             }
         }
     }
     for (t, dp) in temperature.iter().zip(dew_point.iter()) {
         if let (Some(t), Some(dp)) = (*t, *dp) {
             if t < dp {
-                return Err(ValidationError::TemperatureLessThanDewPoint(t, dp));
+                ve.push_error(Err(ValidationError::TemperatureLessThanDewPoint(t, dp)));
             }
         }
     }
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
         if let (Some(wb), Some(dp)) = (*wb, *dp) {
             if wb < dp {
-                return Err(ValidationError::WetBulbLessThanDewPoint(wb, dp));
+                ve.push_error(Err(ValidationError::WetBulbLessThanDewPoint(wb, dp)));
             }
         }
     }
-
-    Ok(())
 }

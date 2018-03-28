@@ -4,7 +4,7 @@ use std::fmt;
 use failure::Fail;
 
 /// Validation errors.
-#[derive(Debug, Fail)]
+#[derive(Clone, Copy, Debug, Fail, PartialEq)]
 pub enum ValidationError {
     /// Sounding did not have a profile for pressure.
     #[fail(display="No profile for pressure.")]
@@ -32,9 +32,12 @@ pub enum ValidationError {
     /// Invalid negative value, such as speed which must be positive.
     #[fail(display="{} less than 0.0 ({})", _0, _1)]
     InvalidNegativeValue(&'static str, f64),
-    /// Invalid positive value, such as CIN which is always negative.
-    #[fail(display="{} greater than 0.0 ({})", _0, _1)]
-    InvalidPositiveValue(&'static str, f64),
+    /// Invalid wind direction.
+    #[fail(display="Wind direction {} not in 0 to 360\u{00B0} range", _0)]
+    InvalidWindDirection(f64),
+    // Invalid positive value, such as CIN which is always negative.
+    // #[fail(display="{} greater than 0.0 ({})", _0, _1)]
+    // InvalidPositiveValue(&'static str, f64),
 }
 
 /// Collection of validation errors.
@@ -50,7 +53,7 @@ impl ValidationErrors {
     }
 
     /// Get the interior list of errors.
-    pub fn to_vec(self) -> Vec<ValidationError> {
+    pub fn to_inner(self) -> Vec<ValidationError> {
         self.errors
     }
 
