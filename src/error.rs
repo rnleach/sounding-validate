@@ -4,18 +4,18 @@ use std::fmt;
 use failure::Fail;
 
 /// Validation errors.
-#[derive(Debug, Fail)]
+#[derive(Clone, Copy, Debug, Fail, PartialEq)]
 pub enum ValidationError {
     /// Sounding did not have a profile for pressure.
     #[fail(display="No profile for pressure.")]
     NoPressureProfile,
-    /// One of the profiles had a vector length that did not match the length of the pressure 
+    /// One of the profiles had a vector length that did not match the length of the pressure
     /// profile vector. This is required because pressure is the vertical coordinate. The string is
     /// the name of the profile, the first `usize` is the length of that profile, and the second
     /// `usize` is the length it should have been.
     #[fail(display="Vector length for profile of {} ({}) does not match length of pressure profile: {}.", _0, _1, _2)]
     InvalidVectorLength(&'static str, usize, usize),
-    /// Pressure not decreasing with height. This also checks that geopotential increases 
+    /// Pressure not decreasing with height. This also checks that geopotential increases
     /// "with height". It assumes the vectors are sorted with values from the lowest level to the
     /// highest level above ground.
     #[fail(display="Pressure not decreasing with height.")]
@@ -32,13 +32,16 @@ pub enum ValidationError {
     /// Invalid negative value, such as speed which must be positive.
     #[fail(display="{} less than 0.0 ({})", _0, _1)]
     InvalidNegativeValue(&'static str, f64),
-    /// Invalid positive value, such as CIN which is always negative.
-    #[fail(display="{} greater than 0.0 ({})", _0, _1)]
-    InvalidPositiveValue(&'static str, f64),
+    /// Invalid wind direction.
+    #[fail(display="Wind direction {} not in 0 to 360\u{00B0} range", _0)]
+    InvalidWindDirection(f64),
+    // Invalid positive value, such as CIN which is always negative.
+    // #[fail(display="{} greater than 0.0 ({})", _0, _1)]
+    // InvalidPositiveValue(&'static str, f64),
 }
 
 /// Collection of validation errors.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ValidationErrors {
     errors: Vec<ValidationError>,
 }
@@ -46,19 +49,18 @@ pub struct ValidationErrors {
 impl ValidationErrors {
     /// Create a new collection of errors.
     pub fn new() -> Self {
-        ValidationErrors{errors: vec![]}
+        ValidationErrors { errors: vec![] }
     }
 
     /// Get the interior list of errors.
-    pub fn as_vec(self) -> Vec<ValidationError>
-    {
+    pub fn to_inner(self) -> Vec<ValidationError> {
         self.errors
     }
 
     /// Add an error to this list
     pub fn push_error(&mut self, result: Result<(), ValidationError>) {
         match result {
-            Ok(()) => {},
+            Ok(()) => {}
             Err(err) => self.errors.push(err),
         }
     }
@@ -75,17 +77,16 @@ impl ValidationErrors {
 
 impl fmt::Display for ValidationErrors {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f,"\nValidation Errors")?;
+        writeln!(f, "\nValidation Errors")?;
         for error in &self.errors {
             writeln!(f, "     {}", error)?;
         }
 
-        writeln!(f,"")
+        writeln!(f, "")
     }
 }
 
 impl Fail for ValidationErrors {
-
     fn cause(&self) -> Option<&Fail> {
         if self.errors.is_empty() {
             None
@@ -93,5 +94,4 @@ impl Fail for ValidationErrors {
             Some(&self.errors[0])
         }
     }
-
 }
