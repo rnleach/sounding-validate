@@ -137,7 +137,12 @@ fn test_pressure_not_decreasing_with_height() {
     let snd = create_invalid_test_sounding_pressure_not_decreasing_with_height();
     let result = validate(&snd);
     assert!(result.is_err());
-    assert!(result.unwrap_err().to_inner()[0] == ValidationError::PressureNotDecreasingWithHeight);
+    assert!(
+        result
+            .unwrap_err()
+            .to_inner()
+            .contains(&ValidationError::PressureNotDecreasingWithHeight)
+    );
 }
 
 fn create_invalid_test_sounding_pressure_not_decreasing_with_height() -> Sounding {
@@ -148,8 +153,10 @@ fn create_invalid_test_sounding_pressure_not_decreasing_with_height() -> Soundin
 fn test_no_pressure_profile() {
     let snd = create_invalid_test_sounding_no_pressure_profile();
     let result = validate(&snd);
-    assert!(result.is_err());
-    assert!(result.unwrap_err().to_inner()[0] == ValidationError::NoPressureProfile);
+    let err = result.unwrap_err();
+    println!("{}", err);
+
+    assert!(err.to_inner().contains(&ValidationError::NoPressureProfile));
 }
 
 fn create_invalid_test_sounding_no_pressure_profile() -> Sounding {
@@ -167,7 +174,7 @@ fn test_no_invalid_vector_length() {
         err.to_inner()[0]
     {
         assert!(desc == "Temperature");
-        assert!(actual_length == 7 && desired_length == 8);
+        assert!(actual_length == 8 && desired_length == 9);
     } else {
         panic!("Error is of wrong type!");
     }
@@ -299,7 +306,7 @@ fn test_invalid_negative_value() {
     println!("{}", err);
 
     let errs = err.to_inner();
-    assert!(errs.len() == 8);
+    assert!(errs.len() == 9);
 
     for err in errs {
         if let ValidationError::InvalidNegativeValue(_, val) = err {
@@ -348,7 +355,7 @@ fn test_invalid_wind_direction() {
     println!("{}", err);
 
     let errs = err.to_inner();
-    assert!(errs.len() == 5);
+    assert!(errs.len() == 6);
 
     for err in errs {
         if let ValidationError::InvalidWindDirection(val) = err {
