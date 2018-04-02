@@ -153,6 +153,7 @@ fn create_invalid_test_sounding_pressure_not_decreasing_with_height() -> Soundin
 fn test_no_pressure_profile() {
     let snd = create_invalid_test_sounding_no_pressure_profile();
     let result = validate(&snd);
+
     let err = result.unwrap_err();
     println!("{}", err);
 
@@ -211,6 +212,7 @@ fn test_temperature_less_than_wetbulb() {
             panic!("Error is of wrong type!");
         }
     }
+
 }
 
 fn create_invalid_test_temperature_less_than_wetbulb() -> Sounding {
