@@ -212,7 +212,6 @@ fn test_temperature_less_than_wetbulb() {
             panic!("Error is of wrong type!");
         }
     }
-
 }
 
 fn create_invalid_test_temperature_less_than_wetbulb() -> Sounding {

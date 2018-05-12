@@ -7,33 +7,34 @@ use failure::Fail;
 #[derive(Clone, Copy, Debug, Fail, PartialEq)]
 pub enum ValidationError {
     /// Sounding did not have a profile for pressure.
-    #[fail(display="No profile for pressure.")]
+    #[fail(display = "No profile for pressure.")]
     NoPressureProfile,
     /// One of the profiles had a vector length that did not match the length of the pressure
     /// profile vector. This is required because pressure is the vertical coordinate. The string is
     /// the name of the profile, the first `usize` is the length of that profile, and the second
     /// `usize` is the length it should have been.
-    #[fail(display="Vector length for profile of {} ({}) does not match length of pressure profile: {}.", _0, _1, _2)]
+    #[fail(display = "Vector length for profile of {} ({}) does not match length of pressure profile: {}.",
+           _0, _1, _2)]
     InvalidVectorLength(&'static str, usize, usize),
     /// Pressure not decreasing with height. This also checks that geopotential increases
     /// "with height". It assumes the vectors are sorted with values from the lowest level to the
     /// highest level above ground.
-    #[fail(display="Pressure not decreasing with height.")]
+    #[fail(display = "Pressure not decreasing with height.")]
     PressureNotDecreasingWithHeight,
     /// Checks the required relationship between temperature and wet bulb.
-    #[fail(display="Dry bulb temperature less than wet bulb temperature. ({} < {})", _0, _1)]
-    TemperatureLessThanWetBulb(f64,f64),
+    #[fail(display = "Dry bulb temperature less than wet bulb temperature. ({} < {})", _0, _1)]
+    TemperatureLessThanWetBulb(f64, f64),
     /// Checks the required relationship between temperature and dew point.
-    #[fail(display="Dry bulb temperature less than dew point temperature. ({} < {})", _0, _1)]
-    TemperatureLessThanDewPoint(f64,f64),
+    #[fail(display = "Dry bulb temperature less than dew point temperature. ({} < {})", _0, _1)]
+    TemperatureLessThanDewPoint(f64, f64),
     /// Checks the required relationship between wet bulb and dew point.
-    #[fail(display="Wet bulb temperature less than dew point temperature. ({} < {})", _0, _1)]
-    WetBulbLessThanDewPoint(f64,f64),
+    #[fail(display = "Wet bulb temperature less than dew point temperature. ({} < {})", _0, _1)]
+    WetBulbLessThanDewPoint(f64, f64),
     /// Invalid negative value, such as speed which must be positive.
-    #[fail(display="{} less than 0.0 ({})", _0, _1)]
+    #[fail(display = "{} less than 0.0 ({})", _0, _1)]
     InvalidNegativeValue(&'static str, f64),
     /// Invalid wind direction.
-    #[fail(display="Wind direction {} not in 0 to 360\u{00B0} range", _0)]
+    #[fail(display = "Wind direction {} not in 0 to 360\u{00B0} range", _0)]
     InvalidWindDirection(f64),
     // Invalid positive value, such as CIN which is always negative.
     // #[fail(display="{} greater than 0.0 ({})", _0, _1)]

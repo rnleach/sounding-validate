@@ -1,11 +1,12 @@
-use sounding_base::Sounding;
 use error::*;
+use sounding_base::Sounding;
 
 macro_rules! validate_f64_positive {
     ($var:expr, $var_name:expr, $err_list:ident) => {
         if let Some(val) = $var {
             if val < 0.0 {
-                $err_list.push_error(Err(ValidationError::InvalidNegativeValue($var_name, val)));
+                $err_list
+                    .push_error(Err(ValidationError::InvalidNegativeValue($var_name, val)));
             }
         }
     };
