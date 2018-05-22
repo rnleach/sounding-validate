@@ -1,9 +1,11 @@
 use error::*;
 use sounding_base::Sounding;
 
+use optional::{Optioned};
+
 macro_rules! validate_f64_positive {
     ($var:expr, $var_name:expr, $err_list:ident) => {
-        if let Some(val) = $var {
+        if let Some(val) = $var.into() {
             if val < 0.0 {
                 $err_list
                     .push_error(Err(ValidationError::InvalidNegativeValue($var_name, val)));
@@ -14,7 +16,7 @@ macro_rules! validate_f64_positive {
 
 macro_rules! validate_wind_direction {
     ($var:expr, $err_list:ident) => {
-        if let Some(val) = $var {
+        if let Some(val) = $var.into() {
             if val < 0.0 || val > 360.0 {
                 $err_list.push_error(Err(ValidationError::InvalidWindDirection(val)));
             }
@@ -124,7 +126,7 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     err_return.check_any()
 }
 
-fn check_pressure_exists(pressure: &[Option<f64>]) -> Result<(), ValidationError> {
+fn check_pressure_exists(pressure: &[Optioned<f64>]) -> Result<(), ValidationError> {
     if pressure.is_empty() {
         Err(ValidationError::NoPressureProfile)
     } else {
@@ -133,7 +135,7 @@ fn check_pressure_exists(pressure: &[Option<f64>]) -> Result<(), ValidationError
 }
 
 fn validate_vector_len(
-    vec: &[Option<f64>],
+    vec: &[Optioned<f64>],
     len: usize,
     var_name: &'static str,
 ) -> Result<(), ValidationError> {
@@ -157,7 +159,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     let pressure = snd.get_profile(Pressure);
     let mut pressure_one_level_down = snd.get_surface_value(StationPressure)
         .unwrap_or(::std::f64::MAX);
-    for pres in pressure.iter().filter_map(|pres| *pres) {
+    for pres in pressure.iter().filter_map(|pres| pres.map_or(None,|x| Some(x))) {
         if pressure_one_level_down < pres {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
         }
@@ -169,7 +171,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     let mut height_one_level_down = snd.get_station_info()
         .elevation()
         .unwrap_or(::std::f64::MIN);
-    for hght in height.iter().filter_map(|hght| *hght) {
+    for hght in height.iter().filter_map(|hght| hght.map_or(None,|x| Some(x))) {
         if height_one_level_down > hght {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
         }
@@ -188,21 +190,21 @@ fn check_temp_wet_bulb_dew_point(snd: &Sounding, ve: &mut ValidationErrors) {
 
     // Check that dew point <= wet bulb <= t
     for (t, wb) in temperature.iter().zip(wet_bulb.iter()) {
-        if let (Some(t), Some(wb)) = (*t, *wb) {
+        if let (Some(t), Some(wb)) = (t.map_or(None,|x| Some(x)), wb.map_or(None,|x| Some(x))) {
             if t < wb {
                 ve.push_error(Err(ValidationError::TemperatureLessThanWetBulb(t, wb)));
             }
         }
     }
     for (t, dp) in temperature.iter().zip(dew_point.iter()) {
-        if let (Some(t), Some(dp)) = (*t, *dp) {
+        if let (Some(t), Some(dp)) = (t.map_or(None,|x| Some(x)), dp.map_or(None,|x| Some(x))) {
             if t < dp {
                 ve.push_error(Err(ValidationError::TemperatureLessThanDewPoint(t, dp)));
             }
         }
     }
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
-        if let (Some(wb), Some(dp)) = (*wb, *dp) {
+        if let (Some(wb), Some(dp)) = (wb.map_or(None,|x| Some(x)), dp.map_or(None,|x| Some(x))) {
             if wb < dp {
                 ve.push_error(Err(ValidationError::WetBulbLessThanDewPoint(wb, dp)));
             }

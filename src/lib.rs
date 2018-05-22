@@ -19,6 +19,7 @@ pub use validate::validate;
 extern crate failure;
 #[macro_use]
 extern crate failure_derive;
+extern crate optional;
 
 extern crate sounding_base;
 
