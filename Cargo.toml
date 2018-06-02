@@ -16,6 +16,3 @@ failure_derive = "0.1.1"
 optional="0.4.1"
 sounding-base = "^0.7"
 
-[patch.crates-io]
-optional={git="https://github.com/rnleach/optional.git",branch="all_mods"}
-sounding-base={git="https://github.com/rnleach/sounding-base.git", branch="optional"}
