@@ -1,8 +1,10 @@
 extern crate sounding_base;
 extern crate sounding_validate;
+extern crate optional;
 
 use sounding_base::{Sounding, StationInfo};
 use sounding_validate::validate;
+use optional::{Optioned};
 
 fn main() {
     let snd = create_valid_test_sounding();
@@ -33,105 +35,105 @@ fn create_valid_test_sounding() -> Sounding {
         .set_profile(
             Profile::Pressure,
             vec![
-                Option::from(840.0),
-                Option::from(800.0),
-                Option::from(700.0),
-                Option::from(500.0),
-                Option::from(300.0),
-                Option::from(250.0),
-                Option::from(200.0),
-                Option::from(100.0),
+                Optioned::from(840.0),
+                Optioned::from(800.0),
+                Optioned::from(700.0),
+                Optioned::from(500.0),
+                Optioned::from(300.0),
+                Optioned::from(250.0),
+                Optioned::from(200.0),
+                Optioned::from(100.0),
             ],
         )
         .set_profile(
             Profile::Temperature,
             vec![
-                Option::from(20.0),
-                Option::from(15.0),
-                Option::from(2.0),
-                Option::from(-10.0),
-                Option::from(-20.0),
-                Option::from(-30.0),
-                Option::from(-50.0),
-                Option::from(-45.0),
+                Optioned::from(20.0),
+                Optioned::from(15.0),
+                Optioned::from(2.0),
+                Optioned::from(-10.0),
+                Optioned::from(-20.0),
+                Optioned::from(-30.0),
+                Optioned::from(-50.0),
+                Optioned::from(-45.0),
             ],
         )
         .set_profile(
             Profile::WetBulb,
             vec![
-                Option::from(20.0),
-                Option::from(14.0),
-                Option::from(1.0),
-                Option::from(-11.0),
-                Option::from(-25.0),
-                Option::from(-39.0),
-                Option::from(-58.0),
-                Option::from(-60.0),
+                Optioned::from(20.0),
+                Optioned::from(14.0),
+                Optioned::from(1.0),
+                Optioned::from(-11.0),
+                Optioned::from(-25.0),
+                Optioned::from(-39.0),
+                Optioned::from(-58.0),
+                Optioned::from(-60.0),
             ],
         )
         .set_profile(
             Profile::DewPoint,
             vec![
-                Option::from(20.0),
-                Option::from(13.0),
-                Option::from(0.0),
-                Option::from(-12.0),
-                Option::from(-27.0),
-                Option::from(-45.0),
-                Option::from(-62.0),
-                Option::from(-80.0),
+                Optioned::from(20.0),
+                Optioned::from(13.0),
+                Optioned::from(0.0),
+                Optioned::from(-12.0),
+                Optioned::from(-27.0),
+                Optioned::from(-45.0),
+                Optioned::from(-62.0),
+                Optioned::from(-80.0),
             ],
         )
         .set_profile(
             Profile::WindDirection,
             vec![
-                Option::from(0.0),
-                Option::from(40.0),
-                Option::from(80.0),
-                Option::from(120.0),
-                Option::from(160.0),
-                Option::from(200.0),
-                Option::from(240.0),
-                Option::from(280.0),
+                Optioned::from(0.0),
+                Optioned::from(40.0),
+                Optioned::from(80.0),
+                Optioned::from(120.0),
+                Optioned::from(160.0),
+                Optioned::from(200.0),
+                Optioned::from(240.0),
+                Optioned::from(280.0),
             ],
         )
         .set_profile(
             Profile::WindSpeed,
             vec![
-                Option::from(5.0),
-                Option::from(10.0),
-                Option::from(15.0),
-                Option::from(12.0),
-                Option::from(27.0),
-                Option::from(45.0),
-                Option::from(62.0),
-                Option::from(80.0),
+                Optioned::from(5.0),
+                Optioned::from(10.0),
+                Optioned::from(15.0),
+                Optioned::from(12.0),
+                Optioned::from(27.0),
+                Optioned::from(45.0),
+                Optioned::from(62.0),
+                Optioned::from(80.0),
             ],
         )
         .set_profile(
             Profile::GeopotentialHeight,
             vec![
-                Option::from(1050.0),
-                Option::from(2000.0),
-                Option::from(3000.0),
-                Option::from(4000.0),
-                Option::from(5000.0),
-                Option::from(6500.0),
-                Option::from(7000.0),
-                Option::from(8000.0),
+                Optioned::from(1050.0),
+                Optioned::from(2000.0),
+                Optioned::from(3000.0),
+                Optioned::from(4000.0),
+                Optioned::from(5000.0),
+                Optioned::from(6500.0),
+                Optioned::from(7000.0),
+                Optioned::from(8000.0),
             ],
         )
         .set_profile(
             Profile::CloudFraction,
             vec![
-                Option::from(100.0),
-                Option::from(85.0),
-                Option::from(70.0),
-                Option::from(50.0),
-                Option::from(30.0),
-                Option::from(25.0),
-                Option::from(20.0),
-                Option::from(10.0),
+                Optioned::from(100.0),
+                Optioned::from(85.0),
+                Optioned::from(70.0),
+                Optioned::from(50.0),
+                Optioned::from(30.0),
+                Optioned::from(25.0),
+                Optioned::from(20.0),
+                Optioned::from(10.0),
             ],
         )
         .set_surface_value(Surface::MSLP, 1014.0)
