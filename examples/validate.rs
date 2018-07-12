@@ -1,10 +1,10 @@
+extern crate optional;
 extern crate sounding_base;
 extern crate sounding_validate;
-extern crate optional;
 
+use optional::Optioned;
 use sounding_base::{Sounding, StationInfo};
 use sounding_validate::validate;
-use optional::{Optioned};
 
 fn main() {
     let snd = create_valid_test_sounding();

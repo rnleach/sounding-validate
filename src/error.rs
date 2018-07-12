@@ -13,8 +13,12 @@ pub enum ValidationError {
     /// profile vector. This is required because pressure is the vertical coordinate. The string is
     /// the name of the profile, the first `usize` is the length of that profile, and the second
     /// `usize` is the length it should have been.
-    #[fail(display = "Vector length for profile of {} ({}) does not match length of pressure profile: {}.",
-           _0, _1, _2)]
+    #[fail(
+        display = "Vector length for profile of {} ({}) does not match length of pressure profile: {}.",
+        _0,
+        _1,
+        _2
+    )]
     InvalidVectorLength(&'static str, usize, usize),
     /// Pressure not decreasing with height. This also checks that geopotential increases
     /// "with height". It assumes the vectors are sorted with values from the lowest level to the
