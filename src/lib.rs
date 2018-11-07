@@ -15,12 +15,7 @@ pub use validate::validate;
 //
 // Internal use only
 //
-
-extern crate failure;
-#[macro_use]
-extern crate failure_derive;
 extern crate optional;
-
 extern crate sounding_base;
 
 mod error;

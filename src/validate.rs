@@ -161,7 +161,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
         .unwrap_or(::std::f64::MAX);
     for pres in pressure
         .iter()
-        .filter_map(|pres| pres.map_or(None, |x| Some(x)))
+        .filter_map(|pres| pres.into_option())
     {
         if pressure_one_level_down < pres {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
@@ -176,7 +176,7 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
         .unwrap_or(::std::f64::MIN);
     for hght in height
         .iter()
-        .filter_map(|hght| hght.map_or(None, |x| Some(x)))
+        .filter_map(|hght| hght.into_option())
     {
         if height_one_level_down > hght {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
@@ -196,21 +196,21 @@ fn check_temp_wet_bulb_dew_point(snd: &Sounding, ve: &mut ValidationErrors) {
 
     // Check that dew point <= wet bulb <= t
     for (t, wb) in temperature.iter().zip(wet_bulb.iter()) {
-        if let (Some(t), Some(wb)) = (t.map_or(None, |x| Some(x)), wb.map_or(None, |x| Some(x))) {
+        if let (Some(t), Some(wb)) = (t.into_option(), wb.into_option()) {
             if t < wb {
                 ve.push_error(Err(ValidationError::TemperatureLessThanWetBulb(t, wb)));
             }
         }
     }
     for (t, dp) in temperature.iter().zip(dew_point.iter()) {
-        if let (Some(t), Some(dp)) = (t.map_or(None, |x| Some(x)), dp.map_or(None, |x| Some(x))) {
+        if let (Some(t), Some(dp)) = (t.into_option(), dp.into_option()) {
             if t < dp {
                 ve.push_error(Err(ValidationError::TemperatureLessThanDewPoint(t, dp)));
             }
         }
     }
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
-        if let (Some(wb), Some(dp)) = (wb.map_or(None, |x| Some(x)), dp.map_or(None, |x| Some(x))) {
+        if let (Some(wb), Some(dp)) = (wb.into_option(), dp.into_option()) {
             if wb < dp {
                 ve.push_error(Err(ValidationError::WetBulbLessThanDewPoint(wb, dp)));
             }

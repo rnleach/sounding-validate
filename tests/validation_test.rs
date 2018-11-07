@@ -142,7 +142,7 @@ fn test_pressure_not_decreasing_with_height() {
     assert!(
         result
             .unwrap_err()
-            .to_inner()
+            .into_inner()
             .contains(&ValidationError::PressureNotDecreasingWithHeight)
     );
 }
@@ -159,7 +159,7 @@ fn test_no_pressure_profile() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    assert!(err.to_inner().contains(&ValidationError::NoPressureProfile));
+    assert!(err.into_inner().contains(&ValidationError::NoPressureProfile));
 }
 
 fn create_invalid_test_sounding_no_pressure_profile() -> Sounding {
@@ -174,7 +174,7 @@ fn test_no_invalid_vector_length() {
     println!("{}", err);
 
     if let ValidationError::InvalidVectorLength(desc, actual_length, desired_length) =
-        err.to_inner()[0]
+        err.into_inner()[0]
     {
         assert!(desc == "Temperature");
         assert!(actual_length == 8 && desired_length == 9);
@@ -204,7 +204,7 @@ fn test_temperature_less_than_wetbulb() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    let errs = err.to_inner();
+    let errs = err.into_inner();
     assert!(errs.len() == 3);
 
     for err in errs {
@@ -238,7 +238,7 @@ fn test_temperature_less_than_dewpoint() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    let errs = err.to_inner();
+    let errs = err.into_inner();
     assert!(errs.len() == 6);
 
     for err in errs {
@@ -274,7 +274,7 @@ fn test_wetbulb_less_than_dewpoint() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    let errs = err.to_inner();
+    let errs = err.into_inner();
     assert!(errs.len() == 3);
 
     for err in errs {
@@ -308,7 +308,7 @@ fn test_invalid_negative_value() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    let errs = err.to_inner();
+    let errs = err.into_inner();
     assert!(errs.len() == 9);
 
     for err in errs {
@@ -357,7 +357,7 @@ fn test_invalid_wind_direction() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    let errs = err.to_inner();
+    let errs = err.into_inner();
     assert!(errs.len() == 6);
 
     for err in errs {

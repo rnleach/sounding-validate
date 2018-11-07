@@ -1,6 +1,6 @@
 [package]
 name = "sounding-validate"
-version = "0.7.1"
+version = "0.8.0"
 authors = ["Ryan Leach <clumsycodemonkey@gmail.com>"]
 description = """Validation of soundings from the sounding-base crate."""
 repository = "https://github.com/rnleach/sounding-validate.git"
@@ -11,8 +11,6 @@ categories = ["science"]
 keywords = ["weather","sounding","meteorology", "skew-t"]
 
 [dependencies]
-failure = "0.1.1"
-failure_derive = "0.1.1"
-optional="0.4.1"
-sounding-base = "^0.7"
+optional="0.4.3"
+sounding-base = "^0.8"
 
