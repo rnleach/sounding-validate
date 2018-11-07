@@ -7,8 +7,7 @@ macro_rules! validate_f64_positive {
     ($var:expr, $var_name:expr, $err_list:ident) => {
         if let Some(val) = $var.into() {
             if val < 0.0 {
-                $err_list
-                    .push_error(Err(ValidationError::InvalidNegativeValue($var_name, val)));
+                $err_list.push_error(Err(ValidationError::InvalidNegativeValue($var_name, val)));
             }
         }
     };
@@ -157,12 +156,10 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     // Check that pressure always decreases with height and that the station pressure is more
     // than the lowest pressure level in sounding.
     let pressure = snd.get_profile(Pressure);
-    let mut pressure_one_level_down = snd.get_surface_value(StationPressure)
+    let mut pressure_one_level_down = snd
+        .get_surface_value(StationPressure)
         .unwrap_or(::std::f64::MAX);
-    for pres in pressure
-        .iter()
-        .filter_map(|pres| pres.into_option())
-    {
+    for pres in pressure.iter().filter_map(|pres| pres.into_option()) {
         if pressure_one_level_down < pres {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
         }
@@ -171,13 +168,11 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
 
     // Check height always increases with height.
     let height = snd.get_profile(GeopotentialHeight);
-    let mut height_one_level_down = snd.get_station_info()
+    let mut height_one_level_down = snd
+        .get_station_info()
         .elevation()
         .unwrap_or(::std::f64::MIN);
-    for hght in height
-        .iter()
-        .filter_map(|hght| hght.into_option())
-    {
+    for hght in height.iter().filter_map(|hght| hght.into_option()) {
         if height_one_level_down > hght {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
         }

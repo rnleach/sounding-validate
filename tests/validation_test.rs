@@ -36,8 +36,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(200.0),
                 Optioned::from(100.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::Temperature,
             vec![
                 Optioned::from(20.0),
@@ -49,8 +48,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(-50.0),
                 Optioned::from(-45.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::WetBulb,
             vec![
                 Optioned::from(20.0),
@@ -62,8 +60,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(-58.0),
                 Optioned::from(-60.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::DewPoint,
             vec![
                 Optioned::from(20.0),
@@ -75,8 +72,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(-62.0),
                 Optioned::from(-80.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::WindDirection,
             vec![
                 Optioned::from(0.0),
@@ -88,8 +84,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(240.0),
                 Optioned::from(280.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::WindSpeed,
             vec![
                 Optioned::from(5.0),
@@ -101,8 +96,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(62.0),
                 Optioned::from(80.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::GeopotentialHeight,
             vec![
                 Optioned::from(1050.0),
@@ -114,8 +108,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(7000.0),
                 Optioned::from(8000.0),
             ],
-        )
-        .set_profile(
+        ).set_profile(
             Profile::CloudFraction,
             vec![
                 Optioned::from(100.0),
@@ -127,8 +120,7 @@ fn create_valid_test_sounding() -> Sounding {
                 Optioned::from(20.0),
                 Optioned::from(10.0),
             ],
-        )
-        .set_surface_value(Surface::MSLP, 1014.0)
+        ).set_surface_value(Surface::MSLP, 1014.0)
         .set_surface_value(Surface::StationPressure, 847.0)
         .set_surface_value(Surface::WindSpeed, 0.0)
         .set_surface_value(Surface::WindDirection, 0.0)
@@ -159,7 +151,10 @@ fn test_no_pressure_profile() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    assert!(err.into_inner().contains(&ValidationError::NoPressureProfile));
+    assert!(
+        err.into_inner()
+            .contains(&ValidationError::NoPressureProfile)
+    );
 }
 
 fn create_invalid_test_sounding_no_pressure_profile() -> Sounding {

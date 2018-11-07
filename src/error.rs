@@ -33,14 +33,16 @@ impl fmt::Display for ValidationError {
         use ValidationError::*;
 
         match self {
-            NoPressureProfile => write!(f,"missing pressure profile"),
-            InvalidVectorLength(_, _, _) => write!(f,"vectors do not match length"),
-            PressureNotDecreasingWithHeight => write!(f,"pressure not decreasing with height"),
-            TemperatureLessThanWetBulb(_, _) => write!(f,"temperature less than wet bulb"),
-            TemperatureLessThanDewPoint(_, _) => write!(f,"temperature less than dew point"),
-            WetBulbLessThanDewPoint(_, _) => write!(f,"wet bulb less than dew point"),
-            InvalidNegativeValue(msg, val) => write!(f,"invalid negative value: {} : {}", msg, val),
-            InvalidWindDirection(dir)=> write!(f,"invalid wind direction: {}", dir),
+            NoPressureProfile => write!(f, "missing pressure profile"),
+            InvalidVectorLength(_, _, _) => write!(f, "vectors do not match length"),
+            PressureNotDecreasingWithHeight => write!(f, "pressure not decreasing with height"),
+            TemperatureLessThanWetBulb(_, _) => write!(f, "temperature less than wet bulb"),
+            TemperatureLessThanDewPoint(_, _) => write!(f, "temperature less than dew point"),
+            WetBulbLessThanDewPoint(_, _) => write!(f, "wet bulb less than dew point"),
+            InvalidNegativeValue(msg, val) => {
+                write!(f, "invalid negative value: {} : {}", msg, val)
+            }
+            InvalidWindDirection(dir) => write!(f, "invalid wind direction: {}", dir),
         }
     }
 }
