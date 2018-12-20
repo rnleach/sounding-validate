@@ -30,7 +30,7 @@ pub enum ValidationError {
 
 impl fmt::Display for ValidationError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use ValidationError::*;
+        use crate::ValidationError::*;
 
         match self {
             NoPressureProfile => write!(f, "missing pressure profile"),

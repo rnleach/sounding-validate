@@ -9,8 +9,8 @@ See [examples](examples/validate.rs) for example of library use.
 //
 // API
 //
-pub use error::{ValidationError, ValidationErrors};
-pub use validate::validate;
+pub use crate::error::{ValidationError, ValidationErrors};
+pub use crate::validate::validate;
 
 //
 // Internal use only
