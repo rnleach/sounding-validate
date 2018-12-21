@@ -15,8 +15,6 @@ pub use crate::validate::validate;
 //
 // Internal use only
 //
-extern crate optional;
-extern crate sounding_base;
 
 mod error;
 mod validate;

@@ -1,11 +1,13 @@
 use crate::error::*;
+use metfor::{HectoPascal, WindSpdDir, Meters, Celsius};
 use sounding_base::Sounding;
 
-use optional::Optioned;
+use optional::{Optioned, some};
 
 macro_rules! validate_f64_positive {
     ($var:expr, $var_name:expr, $err_list:ident) => {
-        if let Some(val) = $var.into() {
+        if let Some(val) = $var.into_option() {
+            let val: f64 = metfor::Quantity::unpack(val);
             if val < 0.0 {
                 $err_list.push_error(Err(ValidationError::InvalidNegativeValue($var_name, val)));
             }
@@ -26,12 +28,10 @@ macro_rules! validate_wind_direction {
 /// Validates the sounding with some simple sanity checks. For instance, checks that pressure
 /// decreases with height.
 pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
-    use sounding_base::Profile;
-    use sounding_base::Surface;
 
     let mut err_return = ValidationErrors::new();
 
-    let pressure = snd.get_profile(Profile::Pressure);
+    let pressure = snd.pressure_profile();
 
     //
     // Sounding checks
@@ -41,22 +41,20 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     err_return.push_error(check_pressure_exists(pressure));
 
     let len = pressure.len();
-    let temperature = snd.get_profile(Profile::Temperature);
-    let wet_bulb = snd.get_profile(Profile::WetBulb);
-    let dew_point = snd.get_profile(Profile::DewPoint);
-    let theta_e = snd.get_profile(Profile::ThetaE);
-    let direction = snd.get_profile(Profile::WindDirection);
-    let speed = snd.get_profile(Profile::WindSpeed);
-    let omega = snd.get_profile(Profile::PressureVerticalVelocity);
-    let height = snd.get_profile(Profile::GeopotentialHeight);
-    let cloud_fraction = snd.get_profile(Profile::CloudFraction);
+    let temperature = snd.temperature_profile();
+    let wet_bulb = snd.wet_bulb_profile();
+    let dew_point = snd.dew_point_profile();
+    let theta_e = snd.theta_e_profile();
+    let wind = snd.wind_profile();
+    let omega = snd.pvv_profile();
+    let height = snd.height_profile();
+    let cloud_fraction = snd.cloud_fraction_profile();
 
     err_return.push_error(validate_vector_len(temperature, len, "Temperature"));
     err_return.push_error(validate_vector_len(wet_bulb, len, "Wet bulb temperature"));
     err_return.push_error(validate_vector_len(dew_point, len, "Dew point"));
     err_return.push_error(validate_vector_len(theta_e, len, "Theta-e"));
-    err_return.push_error(validate_vector_len(direction, len, "Wind direction"));
-    err_return.push_error(validate_vector_len(speed, len, "wind speed"));
+    err_return.push_error(validate_vector_len(wind, len, "Wind"));
     err_return.push_error(validate_vector_len(
         omega,
         len,
@@ -73,14 +71,12 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     // Check that dew point <= wet bulb <= t
     check_temp_wet_bulb_dew_point(snd, &mut err_return);
 
-    // Check that speed >= 0
-    for spd in speed {
-        validate_f64_positive!(*spd, "Wind speed", err_return);
-    }
-
-    // Check that direction >= 0 && <= 360
-    for dir in direction {
-        validate_wind_direction!(*dir, err_return);
+    // Check that speed >= 0 and direction 0-360
+    for wind_val in wind {
+        if let Some(WindSpdDir{speed_kt: spd, direction: dir}) = wind_val.into_option(){
+            validate_f64_positive!(some(spd), "Wind speed", err_return);
+            validate_wind_direction!(dir, err_return);
+        }
     }
 
     // Check that cloud fraction >= 0
@@ -91,33 +87,30 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     // Surface checks
     // Check that hi, mid, and low cloud are all positive or zero
     validate_f64_positive!(
-        snd.get_surface_value(Surface::LowCloud),
+        snd.low_cloud(),
         "Low cloud",
         err_return
     );
     validate_f64_positive!(
-        snd.get_surface_value(Surface::MidCloud),
+        snd.mid_cloud(),
         "Mid cloud",
         err_return
     );
     validate_f64_positive!(
-        snd.get_surface_value(Surface::HighCloud),
+        snd.high_cloud(),
         "Hi cloud",
         err_return
     );
 
-    validate_f64_positive!(
-        snd.get_surface_value(Surface::WindSpeed),
-        "Surface wind speed",
-        err_return
-    );
+    if let Some(WindSpdDir{speed_kt: spd, direction: dir}) = snd.sfc_wind().into_option(){
+            validate_f64_positive!(some(spd), "Wind speed", err_return);
+            validate_wind_direction!(dir, err_return);
+        }
 
-    validate_wind_direction!(snd.get_surface_value(Surface::WindDirection), err_return);
-
-    validate_f64_positive!(snd.get_surface_value(Surface::MSLP), "MSLP", err_return);
+    validate_f64_positive!(snd.mslp(), "MSLP", err_return);
 
     validate_f64_positive!(
-        snd.get_surface_value(Surface::StationPressure),
+        snd.station_pressure(),
         "Station pressure",
         err_return
     );
@@ -125,7 +118,7 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     err_return.check_any()
 }
 
-fn check_pressure_exists(pressure: &[Optioned<f64>]) -> Result<(), ValidationError> {
+fn check_pressure_exists(pressure: &[Optioned<HectoPascal>]) -> Result<(), ValidationError> {
     if pressure.is_empty() {
         Err(ValidationError::NoPressureProfile)
     } else {
@@ -133,8 +126,8 @@ fn check_pressure_exists(pressure: &[Optioned<f64>]) -> Result<(), ValidationErr
     }
 }
 
-fn validate_vector_len(
-    vec: &[Optioned<f64>],
+fn validate_vector_len<T>(
+    vec: &[T],
     len: usize,
     var_name: &'static str,
 ) -> Result<(), ValidationError> {
@@ -150,16 +143,16 @@ fn validate_vector_len(
 }
 
 fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError> {
-    use sounding_base::Profile::{GeopotentialHeight, Pressure};
-    use sounding_base::Surface::StationPressure;
 
     // Check that pressure always decreases with height and that the station pressure is more
     // than the lowest pressure level in sounding.
-    let pressure = snd.get_profile(Pressure);
-    let mut pressure_one_level_down = snd
-        .get_surface_value(StationPressure)
+    let pressure = snd.pressure_profile().into_iter()
+        .filter_map(|val| val.into_option())
+        .map(|HectoPascal(val)| val);
+    let mut pressure_one_level_down = snd.station_pressure()
+        .map_t(|HectoPascal(val)| val)
         .unwrap_or(::std::f64::MAX);
-    for pres in pressure.iter().filter_map(|pres| pres.into_option()) {
+    for pres in pressure {
         if pressure_one_level_down < pres {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
         }
@@ -167,12 +160,14 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     }
 
     // Check height always increases with height.
-    let height = snd.get_profile(GeopotentialHeight);
+    let height = snd.height_profile().into_iter()
+        .filter_map(|val| val.into_option())
+        .map(|Meters(val)| val);
     let mut height_one_level_down = snd
-        .get_station_info()
-        .elevation()
+        .station_info()
+        .elevation().map(|Meters(val)| val)
         .unwrap_or(::std::f64::MIN);
-    for hght in height.iter().filter_map(|hght| hght.into_option()) {
+    for hght in height {
         if height_one_level_down > hght {
             return Err(ValidationError::PressureNotDecreasingWithHeight);
         }
@@ -183,29 +178,28 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
 }
 
 fn check_temp_wet_bulb_dew_point(snd: &Sounding, ve: &mut ValidationErrors) {
-    use sounding_base::Profile::{DewPoint, Temperature, WetBulb};
 
-    let temperature = snd.get_profile(Temperature);
-    let wet_bulb = snd.get_profile(WetBulb);
-    let dew_point = snd.get_profile(DewPoint);
+    let temperature = snd.temperature_profile();
+    let wet_bulb = snd.wet_bulb_profile();
+    let dew_point = snd.dew_point_profile();
 
     // Check that dew point <= wet bulb <= t
     for (t, wb) in temperature.iter().zip(wet_bulb.iter()) {
-        if let (Some(t), Some(wb)) = (t.into_option(), wb.into_option()) {
+        if let (Some(Celsius(t)), Some(Celsius(wb))) = (t.into_option(), wb.into_option()) {
             if t < wb {
                 ve.push_error(Err(ValidationError::TemperatureLessThanWetBulb(t, wb)));
             }
         }
     }
     for (t, dp) in temperature.iter().zip(dew_point.iter()) {
-        if let (Some(t), Some(dp)) = (t.into_option(), dp.into_option()) {
+        if let (Some(Celsius(t)), Some(Celsius(dp))) = (t.into_option(), dp.into_option()) {
             if t < dp {
                 ve.push_error(Err(ValidationError::TemperatureLessThanDewPoint(t, dp)));
             }
         }
     }
     for (wb, dp) in wet_bulb.iter().zip(dew_point.iter()) {
-        if let (Some(wb), Some(dp)) = (wb.into_option(), dp.into_option()) {
+        if let (Some(Celsius(wb)), Some(Celsius(dp))) = (wb.into_option(), dp.into_option()) {
             if wb < dp {
                 ve.push_error(Err(ValidationError::WetBulbLessThanDewPoint(wb, dp)));
             }
