@@ -1,7 +1,4 @@
-extern crate optional;
-extern crate sounding_base;
-extern crate sounding_validate;
-
+use metfor::{Celsius, HectoPascal, Meters, WindSpdDir};
 use optional::Optioned;
 use sounding_base::{Sounding, StationInfo};
 use sounding_validate::{validate, ValidationError};
@@ -17,113 +14,114 @@ fn test_validate() {
 }
 
 fn create_valid_test_sounding() -> Sounding {
-    use sounding_base::Profile;
-    use sounding_base::Surface;
-
     Sounding::new()
-        .set_station_info(StationInfo::new_with_values(1, (45.0, -115.0), 1023.0))
-        .set_valid_time(None)
-        .set_lead_time(0)
-        .set_profile(
-            Profile::Pressure,
-            vec![
-                Optioned::from(840.0),
-                Optioned::from(800.0),
-                Optioned::from(700.0),
-                Optioned::from(500.0),
-                Optioned::from(300.0),
-                Optioned::from(250.0),
-                Optioned::from(200.0),
-                Optioned::from(100.0),
-            ],
-        ).set_profile(
-            Profile::Temperature,
-            vec![
-                Optioned::from(20.0),
-                Optioned::from(15.0),
-                Optioned::from(2.0),
-                Optioned::from(-10.0),
-                Optioned::from(-20.0),
-                Optioned::from(-30.0),
-                Optioned::from(-50.0),
-                Optioned::from(-45.0),
-            ],
-        ).set_profile(
-            Profile::WetBulb,
-            vec![
-                Optioned::from(20.0),
-                Optioned::from(14.0),
-                Optioned::from(1.0),
-                Optioned::from(-11.0),
-                Optioned::from(-25.0),
-                Optioned::from(-39.0),
-                Optioned::from(-58.0),
-                Optioned::from(-60.0),
-            ],
-        ).set_profile(
-            Profile::DewPoint,
-            vec![
-                Optioned::from(20.0),
-                Optioned::from(13.0),
-                Optioned::from(0.0),
-                Optioned::from(-12.0),
-                Optioned::from(-27.0),
-                Optioned::from(-45.0),
-                Optioned::from(-62.0),
-                Optioned::from(-80.0),
-            ],
-        ).set_profile(
-            Profile::WindDirection,
-            vec![
-                Optioned::from(0.0),
-                Optioned::from(40.0),
-                Optioned::from(80.0),
-                Optioned::from(120.0),
-                Optioned::from(160.0),
-                Optioned::from(200.0),
-                Optioned::from(240.0),
-                Optioned::from(280.0),
-            ],
-        ).set_profile(
-            Profile::WindSpeed,
-            vec![
-                Optioned::from(5.0),
-                Optioned::from(10.0),
-                Optioned::from(15.0),
-                Optioned::from(12.0),
-                Optioned::from(27.0),
-                Optioned::from(45.0),
-                Optioned::from(62.0),
-                Optioned::from(80.0),
-            ],
-        ).set_profile(
-            Profile::GeopotentialHeight,
-            vec![
-                Optioned::from(1050.0),
-                Optioned::from(2000.0),
-                Optioned::from(3000.0),
-                Optioned::from(4000.0),
-                Optioned::from(5000.0),
-                Optioned::from(6500.0),
-                Optioned::from(7000.0),
-                Optioned::from(8000.0),
-            ],
-        ).set_profile(
-            Profile::CloudFraction,
-            vec![
-                Optioned::from(100.0),
-                Optioned::from(85.0),
-                Optioned::from(70.0),
-                Optioned::from(50.0),
-                Optioned::from(30.0),
-                Optioned::from(25.0),
-                Optioned::from(20.0),
-                Optioned::from(10.0),
-            ],
-        ).set_surface_value(Surface::MSLP, 1014.0)
-        .set_surface_value(Surface::StationPressure, 847.0)
-        .set_surface_value(Surface::WindSpeed, 0.0)
-        .set_surface_value(Surface::WindDirection, 0.0)
+        .with_station_info(StationInfo::new_with_values(
+            1,
+            (45.0, -115.0),
+            Meters(1023.0),
+        ))
+        .with_valid_time(None)
+        .with_lead_time(0)
+        .with_pressure_profile(vec![
+            Optioned::from(HectoPascal(840.0)),
+            Optioned::from(HectoPascal(800.0)),
+            Optioned::from(HectoPascal(700.0)),
+            Optioned::from(HectoPascal(500.0)),
+            Optioned::from(HectoPascal(300.0)),
+            Optioned::from(HectoPascal(250.0)),
+            Optioned::from(HectoPascal(200.0)),
+            Optioned::from(HectoPascal(100.0)),
+        ])
+        .with_temperature_profile(vec![
+            Optioned::from(Celsius(20.0)),
+            Optioned::from(Celsius(15.0)),
+            Optioned::from(Celsius(2.0)),
+            Optioned::from(Celsius(-10.0)),
+            Optioned::from(Celsius(-20.0)),
+            Optioned::from(Celsius(-30.0)),
+            Optioned::from(Celsius(-50.0)),
+            Optioned::from(Celsius(-45.0)),
+        ])
+        .with_wet_bulb_profile(vec![
+            Optioned::from(Celsius(20.0)),
+            Optioned::from(Celsius(14.0)),
+            Optioned::from(Celsius(1.0)),
+            Optioned::from(Celsius(-11.0)),
+            Optioned::from(Celsius(-25.0)),
+            Optioned::from(Celsius(-39.0)),
+            Optioned::from(Celsius(-58.0)),
+            Optioned::from(Celsius(-60.0)),
+        ])
+        .with_dew_point_profile(vec![
+            Optioned::from(Celsius(20.0)),
+            Optioned::from(Celsius(13.0)),
+            Optioned::from(Celsius(0.0)),
+            Optioned::from(Celsius(-12.0)),
+            Optioned::from(Celsius(-27.0)),
+            Optioned::from(Celsius(-45.0)),
+            Optioned::from(Celsius(-62.0)),
+            Optioned::from(Celsius(-80.0)),
+        ])
+        .with_wind_profile(vec![
+            Optioned::from(WindSpdDir {
+                direction: 0.0,
+                speed_kt: 5.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 40.0,
+                speed_kt: 10.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 80.0,
+                speed_kt: 15.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 120.0,
+                speed_kt: 12.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 160.0,
+                speed_kt: 27.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 200.0,
+                speed_kt: 45.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 240.0,
+                speed_kt: 62.0,
+            }),
+            Optioned::from(WindSpdDir {
+                direction: 280.0,
+                speed_kt: 80.0,
+            }),
+        ])
+        .with_height_profile(vec![
+            Optioned::from(Meters(1050.0)),
+            Optioned::from(Meters(2000.0)),
+            Optioned::from(Meters(3000.0)),
+            Optioned::from(Meters(4000.0)),
+            Optioned::from(Meters(5000.0)),
+            Optioned::from(Meters(6500.0)),
+            Optioned::from(Meters(7000.0)),
+            Optioned::from(Meters(8000.0)),
+        ])
+        .with_cloud_fraction_profile(vec![
+            Optioned::from(100.0),
+            Optioned::from(85.0),
+            Optioned::from(70.0),
+            Optioned::from(50.0),
+            Optioned::from(30.0),
+            Optioned::from(25.0),
+            Optioned::from(20.0),
+            Optioned::from(10.0),
+        ])
+        .with_mslp(HectoPascal(1014.0))
+        .with_station_pressure(HectoPascal(847.0))
+        .with_sfc_wind(WindSpdDir {
+            speed_kt: 0.0,
+            direction: 0.0,
+        })
 }
 
 #[test]
@@ -131,16 +129,14 @@ fn test_pressure_not_decreasing_with_height() {
     let snd = create_invalid_test_sounding_pressure_not_decreasing_with_height();
     let result = validate(&snd);
     assert!(result.is_err());
-    assert!(
-        result
-            .unwrap_err()
-            .into_inner()
-            .contains(&ValidationError::PressureNotDecreasingWithHeight)
-    );
+    assert!(result
+        .unwrap_err()
+        .into_inner()
+        .contains(&ValidationError::PressureNotDecreasingWithHeight));
 }
 
 fn create_invalid_test_sounding_pressure_not_decreasing_with_height() -> Sounding {
-    create_valid_test_sounding().set_surface_value(sounding_base::Surface::StationPressure, 830.0)
+    create_valid_test_sounding().with_station_pressure(HectoPascal(830.0))
 }
 
 #[test]
@@ -151,14 +147,13 @@ fn test_no_pressure_profile() {
     let err = result.unwrap_err();
     println!("{}", err);
 
-    assert!(
-        err.into_inner()
-            .contains(&ValidationError::NoPressureProfile)
-    );
+    assert!(err
+        .into_inner()
+        .contains(&ValidationError::NoPressureProfile));
 }
 
 fn create_invalid_test_sounding_no_pressure_profile() -> Sounding {
-    create_valid_test_sounding().set_profile(sounding_base::Profile::Pressure, vec![])
+    create_valid_test_sounding().with_pressure_profile(vec![])
 }
 
 #[test]
@@ -171,25 +166,25 @@ fn test_no_invalid_vector_length() {
     if let ValidationError::InvalidVectorLength(desc, actual_length, desired_length) =
         err.into_inner()[0]
     {
-        assert!(desc == "Temperature");
-        assert!(actual_length == 8 && desired_length == 9);
+        assert_eq!(desc, "Cloud fraction");
+        assert_eq!(actual_length, 7);
+        assert_eq!(desired_length, 9);
     } else {
         panic!("Error is of wrong type!");
     }
 }
 
 fn create_invalid_test_sounding_vector_legth() -> Sounding {
-    let t_profile = vec![
+    let cloud_profile = vec![
         Optioned::from(20.0),
         Optioned::from(15.0),
         Optioned::from(2.0),
-        Optioned::from(-10.0),
-        Optioned::from(-20.0),
-        Optioned::from(-30.0),
-        Optioned::from(-50.0),
+        Optioned::from(10.0),
+        Optioned::from(20.0),
+        Optioned::from(30.0),
     ];
 
-    create_valid_test_sounding().set_profile(sounding_base::Profile::Temperature, t_profile)
+    create_valid_test_sounding().with_cloud_fraction_profile(cloud_profile)
 }
 
 #[test]
@@ -213,17 +208,17 @@ fn test_temperature_less_than_wetbulb() {
 
 fn create_invalid_test_temperature_less_than_wetbulb() -> Sounding {
     let t_profile = vec![
-        Optioned::from(20.0),
-        Optioned::from(13.0),
-        Optioned::from(0.0),
-        Optioned::from(-12.0),
-        Optioned::from(-20.0),
-        Optioned::from(-30.0),
-        Optioned::from(-50.0),
-        Optioned::from(-45.0),
+        Optioned::from(Celsius(20.0)),
+        Optioned::from(Celsius(13.0)),
+        Optioned::from(Celsius(0.0)),
+        Optioned::from(Celsius(-12.0)),
+        Optioned::from(Celsius(-20.0)),
+        Optioned::from(Celsius(-30.0)),
+        Optioned::from(Celsius(-50.0)),
+        Optioned::from(Celsius(-45.0)),
     ];
 
-    create_valid_test_sounding().set_profile(sounding_base::Profile::Temperature, t_profile)
+    create_valid_test_sounding().with_temperature_profile(t_profile)
 }
 
 #[test]
@@ -249,17 +244,17 @@ fn test_temperature_less_than_dewpoint() {
 
 fn create_invalid_test_temperature_less_than_dewpoint() -> Sounding {
     let t_profile = vec![
-        Optioned::from(20.0),
-        Optioned::from(10.0),
-        Optioned::from(-1.0),
-        Optioned::from(-13.0),
-        Optioned::from(-20.0),
-        Optioned::from(-30.0),
-        Optioned::from(-50.0),
-        Optioned::from(-45.0),
+        Optioned::from(Celsius(20.0)),
+        Optioned::from(Celsius(10.0)),
+        Optioned::from(Celsius(-1.0)),
+        Optioned::from(Celsius(-13.0)),
+        Optioned::from(Celsius(-20.0)),
+        Optioned::from(Celsius(-30.0)),
+        Optioned::from(Celsius(-50.0)),
+        Optioned::from(Celsius(-45.0)),
     ];
 
-    create_valid_test_sounding().set_profile(sounding_base::Profile::Temperature, t_profile)
+    create_valid_test_sounding().with_temperature_profile(t_profile)
 }
 
 #[test]
@@ -283,17 +278,17 @@ fn test_wetbulb_less_than_dewpoint() {
 
 fn create_invalid_test_wetbulb_less_than_dewpoint() -> Sounding {
     let wb_profile = vec![
-        Optioned::from(20.0),
-        Optioned::from(12.0),
-        Optioned::from(-1.0),
-        Optioned::from(-13.0),
-        Optioned::from(-25.0),
-        Optioned::from(-39.0),
-        Optioned::from(-58.0),
-        Optioned::from(-60.0),
+        Optioned::from(Celsius(20.0)),
+        Optioned::from(Celsius(12.0)),
+        Optioned::from(Celsius(-1.0)),
+        Optioned::from(Celsius(-13.0)),
+        Optioned::from(Celsius(-25.0)),
+        Optioned::from(Celsius(-39.0)),
+        Optioned::from(Celsius(-58.0)),
+        Optioned::from(Celsius(-60.0)),
     ];
 
-    create_valid_test_sounding().set_profile(sounding_base::Profile::WetBulb, wb_profile)
+    create_valid_test_sounding().with_wet_bulb_profile(wb_profile)
 }
 
 #[test]
@@ -317,14 +312,38 @@ fn test_invalid_negative_value() {
 
 fn create_invalid_test_invalid_negative_value() -> Sounding {
     let wind_speed = vec![
-        Optioned::from(-5.0),
-        Optioned::from(-10.0),
-        Optioned::from(15.0),
-        Optioned::from(12.0),
-        Optioned::from(27.0),
-        Optioned::from(45.0),
-        Optioned::from(62.0),
-        Optioned::from(80.0),
+        Optioned::from(WindSpdDir {
+            direction: 0.0,
+            speed_kt: -5.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 40.0,
+            speed_kt: -10.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 80.0,
+            speed_kt: 15.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 120.0,
+            speed_kt: 12.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 160.0,
+            speed_kt: 27.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 200.0,
+            speed_kt: 45.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 240.0,
+            speed_kt: 62.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 280.0,
+            speed_kt: 80.0,
+        }),
     ];
     let cc = vec![
         Optioned::from(100.0),
@@ -338,11 +357,14 @@ fn create_invalid_test_invalid_negative_value() -> Sounding {
     ];
 
     create_valid_test_sounding()
-        .set_profile(sounding_base::Profile::WindSpeed, wind_speed)
-        .set_profile(sounding_base::Profile::CloudFraction, cc)
-        .set_surface_value(sounding_base::Surface::MSLP, -1014.0)
-        .set_surface_value(sounding_base::Surface::StationPressure, -847.0)
-        .set_surface_value(sounding_base::Surface::WindSpeed, -10.0)
+        .with_wind_profile(wind_speed)
+        .with_cloud_fraction_profile(cc)
+        .with_mslp(HectoPascal(-1014.0))
+        .with_station_pressure(HectoPascal(-847.0))
+        .with_sfc_wind(WindSpdDir {
+            speed_kt: -10.0,
+            direction: 100.0,
+        })
 }
 
 #[test]
@@ -353,7 +375,7 @@ fn test_invalid_wind_direction() {
     println!("{}", err);
 
     let errs = err.into_inner();
-    assert!(errs.len() == 6);
+    assert_eq!(errs.len(), 4);
 
     for err in errs {
         if let ValidationError::InvalidWindDirection(val) = err {
@@ -366,17 +388,44 @@ fn test_invalid_wind_direction() {
 
 fn create_invalid_test_wind_direction() -> Sounding {
     let wind_dir = vec![
-        Optioned::from(0.0),
-        Optioned::from(40.0),
-        Optioned::from(-80.0),
-        Optioned::from(-120.0),
-        Optioned::from(460.0),
-        Optioned::from(4200.0),
-        Optioned::from(240.0),
-        Optioned::from(280.0),
+        Optioned::from(WindSpdDir {
+            direction: 0.0,
+            speed_kt: 5.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 40.0,
+            speed_kt: 10.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: -80.0,
+            speed_kt: 15.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: -120.0,
+            speed_kt: 12.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 160.0,
+            speed_kt: 27.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 200.0,
+            speed_kt: 45.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 240.0,
+            speed_kt: 62.0,
+        }),
+        Optioned::from(WindSpdDir {
+            direction: 280.0,
+            speed_kt: 80.0,
+        }),
     ];
 
     create_valid_test_sounding()
-        .set_profile(sounding_base::Profile::WindDirection, wind_dir)
-        .set_surface_value(sounding_base::Surface::WindDirection, -90.0)
+        .with_wind_profile(wind_dir)
+        .with_sfc_wind(WindSpdDir {
+            direction: -90.0,
+            speed_kt: 5.0,
+        })
 }
