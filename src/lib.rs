@@ -1,5 +1,5 @@
 #![warn(missing_docs)]
-/*! Provides validation facilities for the 
+/*! Provides validation facilities for the
 [sounding-base](https://github.com/rnleach/sounding-base.git) crate.
 
 See [examples](examples/validate.rs) for example of library use.

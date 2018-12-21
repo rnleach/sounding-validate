@@ -1,8 +1,8 @@
 use crate::error::*;
-use metfor::{HectoPascal, WindSpdDir, Meters, Celsius};
+use metfor::{Celsius, HectoPascal, Meters, WindSpdDir};
 use sounding_base::Sounding;
 
-use optional::{Optioned, some};
+use optional::{some, Optioned};
 
 macro_rules! validate_f64_positive {
     ($var:expr, $var_name:expr, $err_list:ident) => {
@@ -28,7 +28,6 @@ macro_rules! validate_wind_direction {
 /// Validates the sounding with some simple sanity checks. For instance, checks that pressure
 /// decreases with height.
 pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
-
     let mut err_return = ValidationErrors::new();
 
     let pressure = snd.pressure_profile();
@@ -73,7 +72,11 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
 
     // Check that speed >= 0 and direction 0-360
     for wind_val in wind {
-        if let Some(WindSpdDir{speed_kt: spd, direction: dir}) = wind_val.into_option(){
+        if let Some(WindSpdDir {
+            speed_kt: spd,
+            direction: dir,
+        }) = wind_val.into_option()
+        {
             validate_f64_positive!(some(spd), "Wind speed", err_return);
             validate_wind_direction!(dir, err_return);
         }
@@ -86,34 +89,22 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
 
     // Surface checks
     // Check that hi, mid, and low cloud are all positive or zero
-    validate_f64_positive!(
-        snd.low_cloud(),
-        "Low cloud",
-        err_return
-    );
-    validate_f64_positive!(
-        snd.mid_cloud(),
-        "Mid cloud",
-        err_return
-    );
-    validate_f64_positive!(
-        snd.high_cloud(),
-        "Hi cloud",
-        err_return
-    );
+    validate_f64_positive!(snd.low_cloud(), "Low cloud", err_return);
+    validate_f64_positive!(snd.mid_cloud(), "Mid cloud", err_return);
+    validate_f64_positive!(snd.high_cloud(), "Hi cloud", err_return);
 
-    if let Some(WindSpdDir{speed_kt: spd, direction: dir}) = snd.sfc_wind().into_option(){
-            validate_f64_positive!(some(spd), "Wind speed", err_return);
-            validate_wind_direction!(dir, err_return);
-        }
+    if let Some(WindSpdDir {
+        speed_kt: spd,
+        direction: dir,
+    }) = snd.sfc_wind().into_option()
+    {
+        validate_f64_positive!(some(spd), "Wind speed", err_return);
+        validate_wind_direction!(dir, err_return);
+    }
 
     validate_f64_positive!(snd.mslp(), "MSLP", err_return);
 
-    validate_f64_positive!(
-        snd.station_pressure(),
-        "Station pressure",
-        err_return
-    );
+    validate_f64_positive!(snd.station_pressure(), "Station pressure", err_return);
 
     err_return.check_any()
 }
@@ -143,13 +134,15 @@ fn validate_vector_len<T>(
 }
 
 fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError> {
-
     // Check that pressure always decreases with height and that the station pressure is more
     // than the lowest pressure level in sounding.
-    let pressure = snd.pressure_profile().into_iter()
+    let pressure = snd
+        .pressure_profile()
+        .into_iter()
         .filter_map(|val| val.into_option())
         .map(|HectoPascal(val)| val);
-    let mut pressure_one_level_down = snd.station_pressure()
+    let mut pressure_one_level_down = snd
+        .station_pressure()
         .map_t(|HectoPascal(val)| val)
         .unwrap_or(::std::f64::MAX);
     for pres in pressure {
@@ -160,12 +153,15 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
     }
 
     // Check height always increases with height.
-    let height = snd.height_profile().into_iter()
+    let height = snd
+        .height_profile()
+        .into_iter()
         .filter_map(|val| val.into_option())
         .map(|Meters(val)| val);
     let mut height_one_level_down = snd
         .station_info()
-        .elevation().map(|Meters(val)| val)
+        .elevation()
+        .map(|Meters(val)| val)
         .unwrap_or(::std::f64::MIN);
     for hght in height {
         if height_one_level_down > hght {
@@ -178,7 +174,6 @@ fn check_vertical_height_pressure(snd: &Sounding) -> Result<(), ValidationError>
 }
 
 fn check_temp_wet_bulb_dew_point(snd: &Sounding, ve: &mut ValidationErrors) {
-
     let temperature = snd.temperature_profile();
     let wet_bulb = snd.wet_bulb_profile();
     let dew_point = snd.dew_point_profile();
