@@ -1,4 +1,4 @@
-use metfor::{Celsius, HectoPascal, Meters, WindSpdDir, Knots};
+use metfor::{Celsius, HectoPascal, Knots, Meters, WindSpdDir};
 use optional::Optioned;
 use sounding_base::{Sounding, StationInfo};
 use sounding_validate::{validate, ValidationError};
