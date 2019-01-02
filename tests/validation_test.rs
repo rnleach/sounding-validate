@@ -1,4 +1,4 @@
-use metfor::{Celsius, HectoPascal, Meters, WindSpdDir};
+use metfor::{Celsius, HectoPascal, Meters, WindSpdDir, Knots};
 use optional::Optioned;
 use sounding_base::{Sounding, StationInfo};
 use sounding_validate::{validate, ValidationError};
@@ -65,35 +65,35 @@ fn create_valid_test_sounding() -> Sounding {
         .with_wind_profile(vec![
             Optioned::from(WindSpdDir {
                 direction: 0.0,
-                speed_kt: 5.0,
+                speed: Knots(5.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 40.0,
-                speed_kt: 10.0,
+                speed: Knots(10.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 80.0,
-                speed_kt: 15.0,
+                speed: Knots(15.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 120.0,
-                speed_kt: 12.0,
+                speed: Knots(12.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 160.0,
-                speed_kt: 27.0,
+                speed: Knots(27.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 200.0,
-                speed_kt: 45.0,
+                speed: Knots(45.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 240.0,
-                speed_kt: 62.0,
+                speed: Knots(62.0),
             }),
             Optioned::from(WindSpdDir {
                 direction: 280.0,
-                speed_kt: 80.0,
+                speed: Knots(80.0),
             }),
         ])
         .with_height_profile(vec![
@@ -119,7 +119,7 @@ fn create_valid_test_sounding() -> Sounding {
         .with_mslp(HectoPascal(1014.0))
         .with_station_pressure(HectoPascal(847.0))
         .with_sfc_wind(WindSpdDir {
-            speed_kt: 0.0,
+            speed: Knots(0.0),
             direction: 0.0,
         })
 }
@@ -314,35 +314,35 @@ fn create_invalid_test_invalid_negative_value() -> Sounding {
     let wind_speed = vec![
         Optioned::from(WindSpdDir {
             direction: 0.0,
-            speed_kt: -5.0,
+            speed: Knots(-5.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 40.0,
-            speed_kt: -10.0,
+            speed: Knots(-10.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 80.0,
-            speed_kt: 15.0,
+            speed: Knots(15.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 120.0,
-            speed_kt: 12.0,
+            speed: Knots(12.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 160.0,
-            speed_kt: 27.0,
+            speed: Knots(27.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 200.0,
-            speed_kt: 45.0,
+            speed: Knots(45.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 240.0,
-            speed_kt: 62.0,
+            speed: Knots(62.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 280.0,
-            speed_kt: 80.0,
+            speed: Knots(80.0),
         }),
     ];
     let cc = vec![
@@ -362,7 +362,7 @@ fn create_invalid_test_invalid_negative_value() -> Sounding {
         .with_mslp(HectoPascal(-1014.0))
         .with_station_pressure(HectoPascal(-847.0))
         .with_sfc_wind(WindSpdDir {
-            speed_kt: -10.0,
+            speed: Knots(-10.0),
             direction: 100.0,
         })
 }
@@ -390,35 +390,35 @@ fn create_invalid_test_wind_direction() -> Sounding {
     let wind_dir = vec![
         Optioned::from(WindSpdDir {
             direction: 0.0,
-            speed_kt: 5.0,
+            speed: Knots(5.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 40.0,
-            speed_kt: 10.0,
+            speed: Knots(10.0),
         }),
         Optioned::from(WindSpdDir {
             direction: -80.0,
-            speed_kt: 15.0,
+            speed: Knots(15.0),
         }),
         Optioned::from(WindSpdDir {
             direction: -120.0,
-            speed_kt: 12.0,
+            speed: Knots(12.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 160.0,
-            speed_kt: 27.0,
+            speed: Knots(27.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 200.0,
-            speed_kt: 45.0,
+            speed: Knots(45.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 240.0,
-            speed_kt: 62.0,
+            speed: Knots(62.0),
         }),
         Optioned::from(WindSpdDir {
             direction: 280.0,
-            speed_kt: 80.0,
+            speed: Knots(80.0),
         }),
     ];
 
@@ -426,6 +426,6 @@ fn create_invalid_test_wind_direction() -> Sounding {
         .with_wind_profile(wind_dir)
         .with_sfc_wind(WindSpdDir {
             direction: -90.0,
-            speed_kt: 5.0,
+            speed: Knots(5.0),
         })
 }
