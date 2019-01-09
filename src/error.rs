@@ -29,7 +29,7 @@ pub enum ValidationError {
 }
 
 impl fmt::Display for ValidationError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use crate::ValidationError::*;
 
         match self {
@@ -85,7 +85,7 @@ impl ValidationErrors {
 }
 
 impl fmt::Display for ValidationErrors {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "\nValidation Errors")?;
         for error in &self.errors {
             writeln!(f, "     {}", error)?;
