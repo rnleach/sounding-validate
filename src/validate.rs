@@ -73,7 +73,7 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     // Check that speed >= 0 and direction 0-360
     for wind_val in wind {
         if let Some(WindSpdDir {
-            speed_kt: spd,
+            speed: spd,
             direction: dir,
         }) = wind_val.into_option()
         {
@@ -94,7 +94,7 @@ pub fn validate(snd: &Sounding) -> Result<(), ValidationErrors> {
     validate_f64_positive!(snd.high_cloud(), "Hi cloud", err_return);
 
     if let Some(WindSpdDir {
-        speed_kt: spd,
+        speed: spd,
         direction: dir,
     }) = snd.sfc_wind().into_option()
     {

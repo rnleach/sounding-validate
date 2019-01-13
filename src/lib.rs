@@ -1,3 +1,4 @@
+#![doc(test(attr(deny(warnings))))]
 #![warn(missing_docs)]
 /*! Provides validation facilities for the
 [sounding-base](https://github.com/rnleach/sounding-base.git) crate.
