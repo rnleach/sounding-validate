@@ -1,6 +1,6 @@
 [package]
 name = "sounding-validate"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["Ryan Leach <clumsycodemonkey@gmail.com>"]
 description = """Validation of soundings from the sounding-base crate."""
 repository = "https://github.com/rnleach/sounding-validate.git"
