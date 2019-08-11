@@ -5,8 +5,4 @@
 
 # sounding-validate
 
-Provides validation facilities for the
-[sounding-base](https://github.com/rnleach/sounding-base.git) crate.
-
-See [examples](examples/validate.rs) for example of library use.
-
+The functionality of this crate has been merged into the [sounding-analysis](https://github.com/rnleach/sounding-analysis.git) crate, and this crate is no more.
